@@ -40,6 +40,9 @@ Rover: an entity capable of executing commands that change its position and orie
 Orientation: Encodes the information about the behavior of a rover depending of its orientation, such as 
 the result of rotating left and right, or moving ahead
 Mission: defines a region on which a set of rovers is deployed
+MissionControl: Creates and controls missions processing commands from an input stream (e.g. a file, or stdin)
+TelnetMissionControl: enables remote access to the MissionControl by socket
+
 
 DESIGN
 ======
@@ -56,7 +59,10 @@ Finally, the Mission class encapsulates the rules for creating the regions and c
 eployment. It allows sophisticated  control, like sending commands at any time to the rovers.
 
 
+Discussion
+==========
+
+
 TODO
 ====
 
-Implement the interface to receive and process commands

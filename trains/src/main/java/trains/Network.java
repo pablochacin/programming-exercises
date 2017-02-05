@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
  */
 public class Network{
 
- public static enum SearchStrategy {FIRST, ALL};
+  public static enum SearchStrategy {FIRST, ALL};
 
 
   Map<String,Station> stations;
@@ -25,166 +25,174 @@ public class Network{
    * Adds a Station to the network.
    * @throws IllegalArgumentException if the station already exists
    */
-	  public void addStation(String name){
+  public void addStation(String name){
 
-	   if(stations.containsKey(name)){
-	    throw new IllegalArgumentException("Station already exists: " + name);
-	   }
+    if(stations.containsKey(name)){
+      throw new IllegalArgumentException("Station already exists: " + name);
+    }
 
-	   Station station  = new Station(name);
-	   stations.put(name,station);
-	  }
+    Station station  = new Station(name);
+    stations.put(name,station);
+  }
 
-	 /*
-	  * Adds a link between two network with a given distance
-	  * @throws IllegalArgumentException if either  of the network doesn't exists
-	  */
-	 public void addConnection(String origin,String destination, int distance){
-
-	   if(!stations.containsKey(origin) || !stations.containsKey(destination)){
-	     throw new IllegalArgumentException("origin and destination must exists in a connection: " + origin + " --> " + destination);
-	   }
-
-	   Station originStation = stations.get(origin);
-	   originStation.addConnection(destination, distance);
-
-	 }
-
-
-	/**
-	 * Returns the Connection between the two given stations, if exists.
-	 * @param origin String with the name of the origin station
-	 * @param destination String with the name of the destination station
-	 * @return the Connection that connects this two estations of null is none exists
-	 * @throws IllegalArgumentException if any of the two stations doesn't exists
-	 * @throws NoSuchElementException is there is no such connection 
-	 */
-	public Connection getConnection(String origin, String destination){
-
-  if(!stations.containsKey(origin) || !stations.containsKey(destination)){
-     throw new IllegalArgumentException("origin and destination must exists in a connection: " + origin + " --> " + destination);
-   }
-
-   Station originStation = stations.get(origin);
-   if(!originStation.connectsTo(destination)){
-     throw new NoSuchElementException("There is no connection between "+origin + " and " + destination);
-   }
-  
-   return originStation.connectionTo(destination);
-}
-
-
-
- /*
-  * Builds a route (list of Connections) from a list of staton names
-  * 
-  * @param network a Network of Stations with their connecting Connections
-  * @param stations list of station names
-  * @returns a List of Connections representing the route
-  * @throws IlegalArgumentException if 	the route is not valid:
-  *    - has at least two different stations 
-  *    - one station doesn't exists 
-  *    - there is no connection between consecutive stations
+ /**
+  * @retun a List of  Strings with the names of the stations
   */
- public Route buildRoute(List<String> stationList){
- 
-   if(stationList.size() < 2)
-     throw new IllegalArgumentException("Route must have at least one connection");
+  public List<String> getStations(){
+      return new ArrayList<String>(stations.keySet());
+  }
 
-   //TODO: check that the route has at least two different stations
-
-   Route route = new Route();
   
-   String origin = stationList.get(0);
-   for(String destination: stationList.subList(1,stationList.size())){
-     Connection l = getConnection(origin,destination);
-     route.addConnection(l);
-     origin=destination;
-   } 
+  /*
+   * Adds a link between two network with a given distance
+   * @throws IllegalArgumentException if either  of the network doesn't exists
+   */
+  public void addConnection(String origin,String destination, int distance){
 
-   return route;
- }
+    if(!stations.containsKey(origin) || !stations.containsKey(destination)){
+      throw new IllegalArgumentException("origin and destination must exists in a connection: " + origin + " --> " + destination);
+    }
 
+    Station originStation = stations.get(origin);
+    originStation.addConnection(destination, distance);
 
- /* 
-  * Gets routes between the given origin and destination that match the validation
-  * criteria.
-  * The algorithmm uses a modified iterative deep first search, that keeps track of 
-  * visited nodes to generate the routes. For doing so, nodes of the pending seach 
-  * stack are not removed inmediatelly but in a backtracking step. 
-  * The process can follow one of two strategies: find the first one or find all.
-  * @param origin: name of the origin station
-  * @param destination: name of the destinatin station
-  * @param validator: RouteValidator
-  * @param visitor a RouteVisitor that process each route found
-  * @param strategy: route generation strategy
-  * @returns a boolean indicating if at least one of such routes exits.
-  * @throws IllegalArgumentException if either origin or destination doesn't exist
-  */ 
- public boolean  getRoutes(String origin,String destination,RouteVisitor visitor, RouteValidator validator,SearchStrategy strategy){
-
-   if(!stations.containsKey(origin) || !stations.containsKey(destination)){
-     throw new IllegalArgumentException("origin and destination must exists in a route: " + origin + " --> " + destination);
-   }
+  }
 
 
-   boolean found = false;
+  /**
+   * Returns the Connection between the two given stations, if exists.
+   * @param origin String with the name of the origin station
+   * @param destination String with the name of the destination station
+   * @return the Connection that connects this two estations of null is none exists
+   * @throws IllegalArgumentException if any of the two stations doesn't exists
+   * @throws NoSuchElementException is there is no such connection 
+   */
+  public Connection getConnection(String origin, String destination){
 
-   Stack<Connection> route = new Stack<Connection>();
+    if(!stations.containsKey(origin) || !stations.containsKey(destination)){
+      throw new IllegalArgumentException("origin and destination must exists in a connection: " + origin + " --> " + destination);
+    }
 
-   Stack<Connection> pending = new Stack<Connection>();
+    Station originStation = stations.get(origin);
+    if(!originStation.connectsTo(destination)){
+      throw new NoSuchElementException("There is no connection between "+origin + " and " + destination);
+    }
 
-   Station station  = stations.get(origin);
+    return originStation.connectionTo(destination);
+  }
 
-   for(Connection c: station.getConnections()){
+
+
+  /*
+   * Builds a route (list of Connections) from a list of staton names
+   * 
+   * @param network a Network of Stations with their connecting Connections
+   * @param stations list of station names
+   * @returns a List of Connections representing the route
+   * @throws IlegalArgumentException if 	the route is not valid:
+   *    - has at least two different stations 
+   *    - one station doesn't exists 
+   *    - there is no connection between consecutive stations
+   */
+  public Route buildRoute(List<String> stationList){
+
+    if(stationList.size() < 2)
+      throw new IllegalArgumentException("Route must have at least one connection");
+
+    //TODO: check that the route has at least two different stations
+
+    Route route = new Route();
+
+    String origin = stationList.get(0);
+    for(String destination: stationList.subList(1,stationList.size())){
+      Connection l = getConnection(origin,destination);
+      route.addConnection(l);
+      origin=destination;
+    } 
+
+    return route;
+  }
+
+
+  /* 
+   * Gets routes between the given origin and destination that match the validation
+   * criteria.
+   * The algorithmm uses a modified iterative deep first search, that keeps track of 
+   * visited nodes to generate the routes. For doing so, nodes of the pending seach 
+   * stack are not removed inmediatelly but in a backtracking step. 
+   * The process can follow one of two strategies: find the first one or find all.
+   * @param origin: name of the origin station
+   * @param destination: name of the destinatin station
+   * @param validator: RouteValidator
+   * @param visitor a RouteVisitor that process each route found
+   * @param strategy: route generation strategy
+   * @returns a boolean indicating if at least one of such routes exits.
+   * @throws IllegalArgumentException if either origin or destination doesn't exist
+   */ 
+  public boolean  getRoutes(String origin,String destination,RouteVisitor visitor, RouteValidator validator,SearchStrategy strategy){
+
+    if(!stations.containsKey(origin) || !stations.containsKey(destination)){
+      throw new IllegalArgumentException("origin and destination must exists in a route: " + origin + " --> " + destination);
+    }
+
+
+    boolean found = false;
+
+    Stack<Connection> route = new Stack<Connection>();
+
+    Stack<Connection> pending = new Stack<Connection>();
+
+    Station station  = stations.get(origin);
+
+    for(Connection c: station.getConnections()){
       pending.push(c);
-   }
+    }
 
-   dfloop:
-   while(!pending.isEmpty()){
-     
+dfloop:
+    while(!pending.isEmpty()){
+
       //get next pending station, but keep it in the pending stack for future backtracking
       Connection connection = pending.peek();
-     
+
       //add to explored route
       route.push(connection);
       if (connection.getDestination().equals(destination)){
-        if(validator.validate(Route.asRoute(route))){  
-             found = true;
-             visitor.visit(Route.asRoute(route));
-             if (strategy.equals(SearchStrategy.FIRST)){
-                 break dfloop;
-             }
-        }
+	if(validator.validate(Route.asRoute(route))){  
+	  found = true;
+	  visitor.visit(Route.asRoute(route));
+	  if (strategy.equals(SearchStrategy.FIRST)){
+	    break dfloop;
+	  }
+	}
       }
 
       station = stations.get(connection.getDestination());
 
       for(Connection c: station.getConnections()){
-        //prevent loops
-        if(!pending.contains(c))
-            pending.push(c);
+	//prevent loops
+	if(!pending.contains(c))
+	  pending.push(c);
       }
 
       //backtrack to route and pending to previous unexplored branch
       while(!route.isEmpty() && !pending.isEmpty() && route.peek().equals(pending.peek())){
-        route.pop();
-        pending.pop();
-     }
-   }
+	route.pop();
+	pending.pop();
+      }
+    }
 
-  return found;
+    return found;
 
   }
 
 
- /*
-  * convenience method: looks for routes without validation conditions
-  * @see getRoutes(String,String,RouteVisitor,SearchStrategy)
-  */
- public boolean  getRoutes(String origin,String destination,RouteVisitor visitor, SearchStrategy strategy){
-  return getRoutes(origin,destination,visitor,new DummyValidator(),strategy);
-}
+  /*
+   * convenience method: looks for routes without validation conditions
+   * @see getRoutes(String,String,RouteVisitor,SearchStrategy)
+   */
+  public boolean  getRoutes(String origin,String destination,RouteVisitor visitor, SearchStrategy strategy){
+    return getRoutes(origin,destination,visitor,new DummyValidator(),strategy);
+  }
 
 }
- 
+

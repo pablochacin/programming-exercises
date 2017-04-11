@@ -119,17 +119,14 @@ public class RoutePlannerTest {
 
       Network network = loadNetwork();
       RoutePlanner planner = new RoutePlanner(network);
-      assertEquals(" Length of shortest route from A to C must be 9 ",9,planner.getShortestDistance("A","C"));
+      assertEquals(" Length of shortest route from A to C must be 9 ",9,planner.getShortestRoute("A","C").get().getDistance());
     }
 
-  /*
-     Tests the length of the shortest route (in terms of distance to travel) from B to B.
-   */
   @Test
     public void testShortestBB(){  
       Network network = loadNetwork();
       RoutePlanner planner = new RoutePlanner(network);
-      assertEquals(" Length of shortest route from B to B must be 9 ",9,planner.getShortestDistance("B","B"));
+      assertEquals(" Length of shortest route from B to B must be 9 ",9,planner.getShortestRoute("B","B").get().getDistance());
     }
 
 

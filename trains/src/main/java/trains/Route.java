@@ -111,12 +111,12 @@ public class Route{
 
 
   /* 
-   * returns the number of connections in the route
+   * returns the number of stops in the route (not counting the origin)
    */
   public int numConnections(){
 
     //TODO: if route is empty, throw an exception
-    return connections.size();
+    return connections.size()-1;
   }
 
 

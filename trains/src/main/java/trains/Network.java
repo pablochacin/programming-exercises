@@ -6,6 +6,8 @@ import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
+
 /*
  * Offers information about routes
  *
@@ -123,20 +125,17 @@ public class Network{
    * The process can follow one of two strategies: find the first one or find all.
    * @param origin: name of the origin station
    * @param destination: name of the destinatin station
-   * @param validator: RouteValidator
-   * @param visitor a RouteVisitor that process each route found
-   * @param strategy: route generation strategy
    * @returns a boolean indicating if at least one of such routes exits.
    * @throws IllegalArgumentException if either origin or destination doesn't exist
    */ 
-  public boolean  getRoutes(String origin,String destination,RouteVisitor visitor, RouteValidator validator,SearchStrategy strategy){
+  public Stream<Route>  getRoutes(String origin,String destination){
 
     if(!stations.containsKey(origin) || !stations.containsKey(destination)){
       throw new IllegalArgumentException("origin and destination must exists in a route: " + origin + " --> " + destination);
     }
 
 
-    boolean found = false;
+    Stream.Builder<Route> builder = Stream.builder();
 
     Stack<Connection> route = new Stack<Connection>();
 
@@ -148,7 +147,6 @@ public class Network{
       pending.push(c);
     }
 
-dfloop:
     while(!pending.isEmpty()){
 
       //get next pending station, but keep it in the pending stack for future backtracking
@@ -157,13 +155,7 @@ dfloop:
       //add to explored route
       route.push(connection);
       if (connection.getDestination().equals(destination)){
-	if(validator.validate(Route.asRoute(route))){  
-	  found = true;
-	  visitor.visit(Route.asRoute(route));
-	  if (strategy.equals(SearchStrategy.FIRST)){
-	    break dfloop;
-	  }
-	}
+	  builder.add(Route.asRoute(route));
       }
 
       station = stations.get(connection.getDestination());
@@ -181,18 +173,10 @@ dfloop:
       }
     }
 
-    return found;
+    return builder.build();
 
   }
 
-
-  /*
-   * convenience method: looks for routes without validation conditions
-   * @see getRoutes(String,String,RouteVisitor,SearchStrategy)
-   */
-  public boolean  getRoutes(String origin,String destination,RouteVisitor visitor, SearchStrategy strategy){
-    return getRoutes(origin,destination,visitor,new DummyValidator(),strategy);
-  }
 
 }
 

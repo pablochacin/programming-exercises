@@ -4,10 +4,6 @@ project(':libs'){
 apply plugin: 'c'
 apply plugin: 'cunit'
 model{
-//    flavors {
-//        passing
-//        failing
-//    }
 
     buildTypes {
             debug
@@ -43,9 +39,6 @@ model{
         withType(CUnitTestSuiteBinarySpec) {
             lib library: "cunit", linkage: "static"
 
-//                if (flavor == flavors.failing) {
-//                    cCompiler.define "PLUS_BROKEN"
-//                }
         }
     }
 
@@ -55,6 +48,7 @@ model{
 }
 
 apply plugin: 'c'
+apply plugin: 'distribution'
 model {
 
     components{
@@ -80,3 +74,8 @@ model {
 
 }
 
+distTar{
+     baseName = 'myprogram'
+     from {'build/exe/'}
+     compression = Compression.GZIP
+}

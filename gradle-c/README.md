@@ -6,6 +6,7 @@ It shows:
 
 * How to organize the code in components and resolve dependencies
 * How to use CUnit for unit testing
+* How to setup the distribution using a tar file
 
 In particular, the project addresses the CUnit issues with having an executable
 (with a main function)  in the prject. To solve this issue, the project is split

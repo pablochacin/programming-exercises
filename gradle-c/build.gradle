@@ -1,0 +1,82 @@
+
+project(':libs'){
+
+apply plugin: 'c'
+apply plugin: 'cunit'
+model{
+//    flavors {
+//        passing
+//        failing
+//    }
+
+    buildTypes {
+            debug
+            release
+     }
+
+    repositories {
+        libs(PrebuiltLibraries) {
+            cunit {
+                headers.srcDir "/usr/include/"
+                    binaries.withType(StaticLibraryBinary) {
+                        staticLibraryFile = file("/usr/lib/x86_64-linux-gnu/libcunit.a")
+                    }
+            }
+        }
+    }
+
+    components {
+        mylib3(NativeLibrarySpec)
+            mylib1(NativeLibrarySpec){
+                sources.c{
+                    lib library: "mylib3"
+                }
+            }
+        mylib2(NativeLibrarySpec){
+            sources.c{
+                lib library: "mylib3"
+            }
+        }
+    }
+
+    binaries {
+        withType(CUnitTestSuiteBinarySpec) {
+            lib library: "cunit", linkage: "static"
+
+//                if (flavor == flavors.failing) {
+//                    cCompiler.define "PLUS_BROKEN"
+//                }
+        }
+    }
+
+
+}
+
+}
+
+apply plugin: 'c'
+model {
+
+    components{
+        myprogram(NativeExecutableSpec) {
+            sources.c {
+
+                lib project: ':libs', library: 'mylib1', linkage: 'static'
+                lib project: ':libs', library: 'mylib2', linkage: 'static'
+                lib project: ':libs', library: "mylib3", linkage: 'static'
+                source {
+                     srcDir "src/myprogram/c"
+                          include "**/*.c"
+                }
+            }
+            binaries.all {
+                cCompiler.args "-I/opt/local/include"
+                    linker.args "-lm"
+            }
+
+        }
+
+    }
+
+}
+
